@@ -22,6 +22,7 @@ Download the AMQ template. In this example, the ephemeral AMQ broker is used.
 
     oc replace -n openshift -f https://raw.githubusercontent.com/jboss-openshift/application-templates/ose-v1.4.8/amq/amq63-basic.json 
 
+Admin rights are required to create in the openshift namespace
 
 ### Deploy the Ephermeral AMQ broker
 
