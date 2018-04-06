@@ -2,10 +2,10 @@ forked and modified from [quickstart](https://github.com/fabric8-quickstarts/kar
 
 # Karaf Camel AMQ QuickStart
 
-This example shows how to use Camel in a Karaf Container using Blueprint to connect to the A-MQ xPaaS message broker on OpenShift.
-The Red Hat JBoss A-MQ xPaaS product should already be installed and running on your OpenShift installation - see the [documentation](https://docs.openshift.com/enterprise/3.1/using_images/xpaas_images/a_mq.html)
+This example shows how to use Camel in a Karaf Container using Blueprint to connect to the AMQ xPaaS message broker on OpenShift.
+The Red Hat JBoss AMQ xPaaS product should already be installed and running on your OpenShift installation - see the [documentation](https://docs.openshift.com/enterprise/3.1/using_images/xpaas_images/a_mq.html)
 
-This example will connect to the A_MQ message broker and send messages to a queue TEST.FOO
+This example will connect to the AMQ message broker and send messages to a queue TEST.FOO
 
 
 ## Pre-requisites 
