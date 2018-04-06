@@ -74,7 +74,7 @@ Create the following environment variables. Make the appropriate modifications
 
     export OPENSHIFT_CAMEL_APPLICATION_NAME=fis-karaf-camel-amq-route 
 
-    export GIT_REPO_CAMEL_AMQ=https://github.com/fabric8-quickstarts/karaf2-camel-amq.git
+    export GIT_REPO_CAMEL_AMQ=https://github.com/gbengataylor/karaf2-camel-amq.git
 
 Deploy the camel route 
 
