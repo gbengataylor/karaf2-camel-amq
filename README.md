@@ -32,10 +32,6 @@ Create the following environment variables. Make the appropriate modifications
 
     export OPENSHIFT_BROKER_APPLICATION_NAME=broker
 
-Deploy the AMQ broker
-
-    oc new-app --template=amq63-basic app=${OPENSHIFT_BROKER_APPLICATION_NAME} --param  APPLICATION_NAME=${OPENSHIFT_BROKER_APPLICATION_NAME} --param AMQ_MESH_DISCOVERY_TYPE=kube --param MQ_PROTOCOL=openwire --param MQ_USERNAME=admin --param MQ_PASSWORD=password -l app=${OPENSHIFT_BROKER_APPLICATION_NAME} 
-
 The discovery agent type to use for discovering mesh endpoints needs to be set. 'dns' will use OpenShift's DNS service to resolve endpoints. 'kube' will use Kubernetes REST API to resolve service endpoints. 
 
 In this example, 'kube' is used. The service account for the pod must have the 'view' role, which can be added via 
