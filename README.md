@@ -1,4 +1,6 @@
-# Camel AMQ QuickStart
+forked and modified from [quickstart](https://github.com/fabric8-quickstarts/karaf2-camel-amq)
+
+# Karaf Camel AMQ QuickStart
 
 This example shows how to use Camel in a Karaf Container using Blueprint to connect to the A-MQ xPaaS message broker on OpenShift.
 The Red Hat JBoss A-MQ xPaaS product should already be installed and running on your OpenShift installation - see the [documentation](https://docs.openshift.com/enterprise/3.1/using_images/xpaas_images/a_mq.html)
@@ -6,50 +8,78 @@ The Red Hat JBoss A-MQ xPaaS product should already be installed and running on 
 This example will connect to the A_MQ message broker and send messages to a queue TEST.FOO
 
 
-### Building
+## Pre-requisites 
 
-The example can be built with
+### Download the required AMQ images and templates
 
-    mvn clean install
+Download the images
 
+    oc -n openshift import-image jboss-amq-63:1.3
 
-### Running the example in fabric8
+Download the AMQ template. In this example, the ephemeral AMQ broker is used. 
 
-It is assumed that OpenShift platform is already running. If not you can find details how to [Install OpenShift at your site](https://docs.openshift.com/enterprise/3.1/install_config/install/index.html).
+    oc create -n openshift -f https://raw.githubusercontent.com/jboss-openshift/application-templates/ose-v1.4.8/amq/amq63-basic.json 
 
-The example can be built and run on OpenShift using a single goal:
-
-    mvn fabric8:run
-
-When the example runs in OpenShift, you can use the OpenShift client tool to inspect the status
-
-To list all the running pods:
-
-    oc get pods
-
-Then find the name of the pod that runs this quickstart, and output the logs from the running pods with:
-
-    oc logs <name of pod>
-
-You can also use the openshift [web console](https://docs.openshift.com/enterprise/3.1/getting_started/developers/developers_console.html#tutorial-video) to manage the
-running pods, and view logs and much more.
+    oc replace -n openshift -f https://raw.githubusercontent.com/jboss-openshift/application-templates/ose-v1.4.8/amq/amq63-basic.json 
 
 
-### Running the example using OpenShift S2I template
+### Deploy the Ephermeral AMQ broker
 
-The example can also be built and run using the included S2I template quickstart-template.json.
+Create the following environment variables. Make the appropriate modifications
 
-The application can be run directly by first editing the template file and populating S2I build parameters, including the required parameter GIT_REPO and then executing the command:
+    export PROJECT=fis
 
-    oc new-app -f quickstart-template.json
+    export OPENSHIFT_BROKER_APPLICATION_NAME=broker
 
-Alternatively the template file can be used to create an OpenShift application template by executing the command:
+Deploy the AMQ broker
 
-    oc create -f quickstart-template.json
+    oc new-app --template=amq63-basic app=${OPENSHIFT_BROKER_APPLICATION_NAME} --param  APPLICATION_NAME=${OPENSHIFT_BROKER_APPLICATION_NAME} --param AMQ_MESH_DISCOVERY_TYPE=kube --param MQ_PROTOCOL=openwire --param MQ_USERNAME=admin --param MQ_PASSWORD=password -l app=${OPENSHIFT_BROKER_APPLICATION_NAME} 
+
+The discovery agent type to use for discovering mesh endpoints needs to be set. 'dns' will use OpenShift's DNS service to resolve endpoints. 'kube' will use Kubernetes REST API to resolve service endpoints. 
+
+In this example, 'kube' is used. The service account for the pod must have the 'view' role, which can be added via 
+
+    oc policy add-role-to-user view system:serviceaccount:$PROJECT:default
+
+Deploy the AMQ broker
+
+    oc new-app --template=amq63-basic app=${OPENSHIFT_BROKER_APPLICATION_NAME} --param  APPLICATION_NAME=${OPENSHIFT_BROKER_APPLICATION_NAME} --param AMQ_MESH_DISCOVERY_TYPE=kube --param MQ_PROTOCOL=openwire --param MQ_USERNAME=admin --param MQ_PASSWORD=password -l app=${OPENSHIFT_BROKER_APPLICATION_NAME} 
 
 
-### More details
 
-You can find more details about running this [quickstart](http://fabric8.io/guide/quickstarts/running.html) on the website. This also includes instructions how to change the Docker image user and registry.
+### Download the required FIS 2.0 Karaf images 
+
+    oc create -n openshift -f https://raw.githubusercontent.com/jboss-fuse/application-templates/fis-2.0.x.redhat-R6/fis-image-streams.json
+
+Admin rights are required to create in the openshift namespace
+
+The  broker exposes a service on the tcp port name ${OPENSHIFT_BROKER_APPLICATION_NAME}-amq-tcp 
+
+
+### Download the template 
+
+    oc create -n openshift -f  https://raw.githubusercontent.com/jboss-fuse/application-templates/fis-2.0.x.redhat-R6/quickstarts/karaf2-camel-amq-template.json
+
+if it already exists
+
+    oc replace -n openshift -f  https://raw.githubusercontent.com/jboss-fuse/application-templates/fis-2.0.x.redhat-R6/quickstarts/karaf2-camel-amq-template.json
+    		
+Admin rights are required to create/replace in the openshift namespace
+
+## Running the example in OpenShift using template
+
+
+Create the following environment variables. Make the appropriate modifications
+
+    export OPENSHIFT_CAMEL_APPLICATION_NAME=fis-karaf-camel-amq-route 
+
+    export GIT_REPO_CAMEL_AMQ=https://github.com/fabric8-quickstarts/karaf2-camel-amq.git
+
+Deploy the camel route 
+
+    oc new-app --template=s2i-karaf2-camel-amq --param APP_NAME=${OPENSHIFT_CAMEL_APPLICATION_NAME} GIT_REPO=${GIT_REPO_CAMEL_NO_AMQ}  --param SERVICE_NAME=${OPENSHIFT_CAMEL_APPLICATION_NAME} --param ACTIVEMQ_SERVICE_NAME=${OPENSHIFT_BROKER_APPLICATION_NAME}-amq-tcp --param ACTIVEMQ_USERNAME=admin --param ACTIVEMQ_PASSWORD=password -l app=${OPENSHIFT_CAMEL_APPLICATION_NAME} 
+
+
+
 
 
